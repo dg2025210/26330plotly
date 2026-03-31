@@ -80,6 +80,39 @@ div[data-testid="stSidebar"] {
 div[data-testid="stSidebar"] .stMarkdown h3 {
     color: #7c4dff;
 }
+
+/* ── 사이드바 토글(햄버거) 버튼 강제 표시 ── */
+button[data-testid="stSidebarNavSections"],
+button[data-testid="baseButton-headerNoPadding"],
+div[data-testid="collapsedControl"],
+button[kind="header"] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 999999 !important;
+    color: #ffffff !important;
+    background-color: rgba(124, 77, 255, 0.25) !important;
+    border-radius: 8px !important;
+}
+
+/* ── 상단 헤더 바(툴바) 전체 표시 ── */
+header[data-testid="stHeader"] {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: rgba(13, 13, 26, 0.85) !important;
+    backdrop-filter: blur(6px) !important;
+    z-index: 999998 !important;
+}
+
+/* ── 접힌 상태의 사이드바 화살표 버튼 ── */
+div[data-testid="collapsedControl"] button {
+    background-color: rgba(124, 77, 255, 0.4) !important;
+    color: #ffffff !important;
+    border: 1px solid #7c4dff !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
 </style>
 """,
     unsafe_allow_html=True,
@@ -694,12 +727,19 @@ with tab4:
         on=["연도", "시험", "과목"],
         how="inner",
     )
+    # statsmodels 설치 여부에 따라 추세선 방식 결정
+    try:
+        import statsmodels.api  # noqa: F401
+        _trendline = "ols"
+    except ModuleNotFoundError:
+        _trendline = "lowess"   # statsmodels 없을 때 내장 lowess 사용
+
     fig_corr = px.scatter(
         merged,
         x="평균점수", y="정답률(%)",
         color="과목", symbol="시험",
         color_discrete_map=SUBJ_COLORS,
-        trendline="ols",
+        trendline=_trendline,
         template=TPL,
         hover_data=["연도"],
         labels={
