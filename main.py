@@ -140,14 +140,19 @@ with col2:
 # ── Row 2: 누적 막대 (순위별 분포) ──────────────────────────
 st.subheader("📈 순위별 득표 분포 (스택)")
 fig_stack = go.Figure()
+def hex_to_rgba(hex_color: str, alpha: float) -> str:
+    h = hex_color.lstrip("#")
+    r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+    return f"rgba({r},{g},{b},{alpha})"
+
 rank_labels = ["1위", "2위", "3위"]
-rank_colors_alpha = ["FF", "AA", "55"]
-for ri, (rank_label, alpha) in enumerate(zip(rank_labels, rank_colors_alpha), start=1):
+rank_alphas  = [1.0, 0.65, 0.35]
+for ri, (rank_label, alpha) in enumerate(zip(rank_labels, rank_alphas), start=1):
     fig_stack.add_trace(go.Bar(
         name=rank_label,
         x=AIs,
         y=[rank_counts[ai][ri] for ai in AIs],
-        marker_color=[f"{COLORS[ai]}{alpha}" for ai in AIs],
+        marker_color=[hex_to_rgba(COLORS[ai], alpha) for ai in AIs],
         text=[f"{rank_counts[ai][ri]}명" for ai in AIs],
         textposition="inside",
         textfont=dict(size=14, color="white"),
